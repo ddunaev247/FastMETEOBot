@@ -1,8 +1,10 @@
 import flask
 from flask import Flask, request, Response
-from config import TOKEN
+import requests
+from config import TOKEN, WEAHER_URL
 import message_bot
 import telebot
+import json
 
 
 bot = telebot.TeleBot(TOKEN)
@@ -28,11 +30,29 @@ def hello_world():
 def start_messege(message):
     bot.send_message(message.chat.id, message_bot.start)
 
+def parse_weather(data):
+    for elem in data['weather']:
+        weather_state = elem['description']
+    city = data['name']
+    temp = data['main']['temp']
+    print( f'{city}: Температура: {temp}, Описание:{weather_state}')
+    return f'{city}: Температура: {temp}, {weather_state}'
 
-#@bot.message_handler(content_types=['text'])
-#def send_text(message):
-#   if message.text.lower() == 'hi':
-#       bot.send_message(message.chat.id, 'hi and you')
+
+
+def get_weather(city):
+    res = requests.get(WEAHER_URL.format(city=city))
+    if res.status_code != 200:
+        return 'город не найден'
+    data = json.loads(res.content)
+
+    return parse_weather(data)
+
+
+@bot.message_handler(content_types=['text'])
+def send_text(message):
+    query = get_weather(message.text)
+    bot.send_message(message.chat.id, query)
 
 
 
