@@ -35,9 +35,14 @@ def parse_weather(data):
         weather_state = elem['description']
     city = data['name']
     temp = data['main']['temp']
-    print( f'{city}: Температура: {temp}, Описание:{weather_state}')
-    return f'{city}: Температура: {temp}, {weather_state}'
-
+    wind_speed = data['wind']['speed']
+    weather_in_city = f'''
+    Погода в городе {city}:
+    Температура: {temp} °С
+    Условия: {weather_state}
+    Скорость ветра: {wind_speed} м/с'''
+    print( f'{city}: Температура: {temp}, Описание:{weather_state}') #проверка для отладки
+    return weather_in_city
 
 
 def get_weather(city):
@@ -45,7 +50,6 @@ def get_weather(city):
     if res.status_code != 200:
         return 'город не найден'
     data = json.loads(res.content)
-
     return parse_weather(data)
 
 
