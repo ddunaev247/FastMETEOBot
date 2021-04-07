@@ -6,14 +6,14 @@ import message_bot
 import telebot
 from telebot import types
 import json
+from keyboards import keyboard_menu, keyboard_inline, keyboard_shedule
 
 bot = telebot.TeleBot(TOKEN)
-
 
 app = Flask(__name__)
 
 @app.route('/', methods=['POST', 'GET'])
-def hello_world():
+def run_bot():
     if request.headers.get('content-type') == 'application/json':
         update = telebot.types.Update.de_json(request.stream.read().decode('utf-8'))
         bot.process_new_updates([update])
@@ -28,16 +28,8 @@ def hello_world():
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
-    button_weather_in_city = types.KeyboardButton('/Погода')
-    button_shedule = types.KeyboardButton('/Расписание')
-    keyboard.add(button_weather_in_city)
-    keyboard.add(button_shedule)
-    bot.send_message(message.chat.id, message_bot.start, reply_markup=keyboard)
+    bot.send_message(message.chat.id, message_bot.start, reply_markup=keyboard_menu)
 
-    keyboard_inline = types.InlineKeyboardMarkup()
-    button_replay = types.InlineKeyboardButton(text='Заново', callback_data='/Погода')
-    keyboard_inline.add(button_replay)
 
 def parse_weather(data):
     for elem in data['weather']:
@@ -50,34 +42,36 @@ def parse_weather(data):
     Температура: {temp} °С
     Условия: {weather_state}
     Скорость ветра: {wind_speed} м/с'''
-    print( f'{city}: Температура: {temp}, Описание:{weather_state}') #проверка для отладки
+    print(f'{city}: Температура: {temp}, Описание:{weather_state}') #проверка для отладки
     return weather_in_city
 
 
 def get_weather(city):
     res = requests.get(WEAHER_URL.format(city=city))
     if res.status_code != 200:
-        return 'город не найден'
+        return 'город не найден \ud83e\udd37'
     data = json.loads(res.content)
     return parse_weather(data)
 
 @bot.message_handler(commands=['Погода'])
 def command_weather(message):
-    msg = bot.send_message(message.chat.id,'Введи название города')
+
+    msg = bot.send_message(message.chat.id, 'Введи название города')
     bot.register_next_step_handler(msg,command_weather_return )
 
 def command_weather_return(message):
-    button_replay = types.InlineKeyboardButton(text='Заново', callback_data='/Погода')
-    keyboard_inline = types.InlineKeyboardMarkup().add(button_replay)
     result = get_weather(message.text)
     bot.send_message(message.chat.id, result, reply_markup=keyboard_inline)
 
 @bot.callback_query_handler(lambda c: c.data == '/Погода')
 def callback_weather(callback_query):
-    msg = bot.send_message(callback_query.from_user.id,'Введи название города')
+    msg = bot.send_message(callback_query.from_user.id, 'Введи название города')
     bot.register_next_step_handler(msg, command_weather_return)
 
 
+@bot.message_handler(commands=['Расписание'])
+def command_shedule(message):
+    bot.send_message(message.chat.id, message_bot.shedule, reply_markup=keyboard_shedule)
 #@bot.message_handler(content_types=['text'])
 #def send_text(message):
     #query = get_weather(message.text)
