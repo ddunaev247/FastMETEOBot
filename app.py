@@ -4,11 +4,11 @@ import requests
 from config import TOKEN, WEAHER_URL
 import message_bot
 import telebot
-from telebot import logger
 import json
-from keyboards import keyboard_menu, keyboard_inline, keyboard_shedule
+from keyboards import keyboard_menu, keyboard_inline, keyboard_schedule, keyboard_schedule_delete
 from bot_db import *
 import bot_db
+
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -67,36 +67,55 @@ def command_weather_return(message):
 
 @bot.callback_query_handler(lambda c: c.data == '/Погода')
 def callback_weather(callback_query):
+    bot.answer_callback_query(callback_query.id)
     msg = bot.send_message(callback_query.from_user.id, 'Введи название города')
     bot.register_next_step_handler(msg, command_weather_return)
 
 
 @bot.message_handler(commands=['Расписание'])
-def command_shedule(message):
-    bot.send_message(message.chat.id, message_bot.shedule, reply_markup=keyboard_shedule)
+def command_schedule(message):
+    bot.send_message(message.chat.id, message_bot.shedule, reply_markup=keyboard_schedule)
 
 @bot.callback_query_handler(lambda c: c.data == 'set')
-def set_shedule(callback_query):
+def set_schedule(callback_query):
+    bot.answer_callback_query(callback_query.id)
     msg = bot.send_message(callback_query.from_user.id, '1-ое: Введи название города')
     bot.register_next_step_handler(msg, user_city)
 
 def user_city(message):
     msg = bot.send_message(message.chat.id, '2-ое: Введи время')
-    print('00', message.from_user.id)
     bot_db.info.append(message.from_user.id)
     bot_db.info.append(message.text)
-    print('12')
     bot.register_next_step_handler(msg, user_time)
-    print('34')
 
 def user_time(message):
     bot_db.info.append(message.text)
-    print(bot_db.info, message.from_user.id)
-    add_info(tuple(bot_db.info))
-    bot.send_message(message.from_user.id, 'Расписание установлено')
+    add_data_db(bot_db.info)
+    bot.send_message(message.from_user.id, 'Расписание установлено\u2705')
     bot_db.info = []
 
+@bot.callback_query_handler(lambda c: c.data == 'get')
+def get_schedule(callback_query):
+    bot.answer_callback_query(callback_query.id)
+    string = get_user_schedule(callback_query.from_user.id)
+    bot.send_message(callback_query.from_user.id, f'Ваши расписания:\n{string}', reply_markup=keyboard_schedule_delete)
 
+@bot.callback_query_handler(lambda c: c.data == 'delete_one')
+def delete_one(callback_query):
+    bot.answer_callback_query(callback_query.id)
+    msg = bot.send_message(callback_query.from_user.id, 'Введите номер расписания')
+    bot.register_next_step_handler(msg, delete_record)
+
+def delete_record(message):
+    delete_one_schedule(message.text)
+    bot.send_message(message.from_user.id, 'Запись удалена\u2705')
+
+
+@bot.callback_query_handler(lambda c: c.data == 'delete_all')
+def delete_all(callback_query):
+    bot.answer_callback_query(callback_query.id)
+    bot.send_message(callback_query.from_user.id, 'Записи удалены\u2705')
+    delete_all_shedule(callback_query.from_user.id)
 
 #@bot.message_handler(content_types=['text'])
 #def send_text(message):

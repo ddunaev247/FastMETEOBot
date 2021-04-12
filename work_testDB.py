@@ -9,7 +9,6 @@ Base.metadata.create_all(engine)
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
-info = []
 
 class Schedule(Base):
     __tablename__ = 'schedule'
@@ -21,24 +20,25 @@ class Schedule(Base):
        return f'{self.id}, {self.user_id}, {self.city}, {self.time_user}'
 
 
-def add_data_db(data):
+def add_data(data):
     data_record = Schedule(user_id=data[0], city=data[1], time_user=data[2])
     session.add(data_record)
     session.commit()
 
 
 def get_user_schedule(user_id):
-    list_schedule = session.query(Schedule).filter(Schedule.user_id==user_id).all()
-    data_for_message = "\n\r".join([f"{item.id} - {item.city}, {item.time_user}" for item in list_schedule])
-    return data_for_message
+    list_record = []
+    list_shedule = []
+    list_schedule =  session.query(Schedule).filter(Schedule.user_id==user_id).all()
+    my_string = "\n\r".join([f"{item.id} - {item.city}, {item.time_user}" for item in list_schedule])
+    print(list_schedule)
+    print(my_string)
 
-def delete_one_schedule(record_id):
-    delete_record = session.query(Schedule).filter(Schedule.id==record_id).one()
-    session.delete(delete_record)
-    session.commit()
-
+#get_user_schedule(440945969)
 def delete_all_shedule(user_id):
-    delete_all_record = session.query(Schedule).filter(Schedule.user_id == user_id).all()
+    delete_all_record = session.query(Schedule).filter(Schedule.user_id==user_id).all()
     for record in delete_all_record:
         session.delete(record)
     session.commit()
+
+delete_all_shedule(440945969)
