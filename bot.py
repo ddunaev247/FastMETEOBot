@@ -2,15 +2,14 @@
 
 import flask
 from flask import Flask, request, Response
-from config import TOKEN
-import message_bot
+from const import message_bot
+from const.config import TOKEN
 import telebot
-from function_weather import get_weather
-from keyboards import keyboard_menu, keyboard_repeat, keyboard_schedule, keyboard_schedule_delete
-from bot_db import *
-import bot_db
+from func.function_weather import get_weather
+from keyboards.keyboards import keyboard_menu, keyboard_repeat, keyboard_schedule, keyboard_schedule_delete
+from bot_db.bot_db import *
 import logging
-from auto_posting import process_autoposting
+from func.auto_posting import process_autoposting
 
 logger = telebot.logger
 telebot.logger.setLevel(logging.DEBUG)
@@ -76,10 +75,10 @@ def set_schedule(callback_query):
 def user_city(message):
     'function of requesting the city from the user, for the schedule'
     msg = bot.send_message(message.chat.id, '2-ое: Введи время в формате ЧЧ:ММ')
-    if not bot_db.info.get(message.from_user.id) == None:
-        del bot_db.info[message.from_user.id]
-    bot_db.info.setdefault(message.from_user.id,[]).append(message.from_user.id)
-    bot_db.info.setdefault(message.from_user.id,[]).append(message.text)
+    if not info.get(message.from_user.id) == None:
+        del info[message.from_user.id]
+    info.setdefault(message.from_user.id,[]).append(message.from_user.id)
+    info.setdefault(message.from_user.id,[]).append(message.text)
     bot.register_next_step_handler(msg, user_time)
 
 
@@ -88,9 +87,9 @@ def user_time(message):
     time = message.text
     time = time.split(':')
     if (time[0].isdigit() and -1 < int(time[0]) < 24) and (time[1].isdigit() and -1 < int(time[0]) < 59):
-        bot_db.info.setdefault(message.from_user.id,[]).append(time[0])
-        bot_db.info.setdefault(message.from_user.id,[]).append(time[1])
-        add_data_db(bot_db.info, message.from_user.id)
+        info.setdefault(message.from_user.id,[]).append(time[0])
+        info.setdefault(message.from_user.id,[]).append(time[1])
+        add_data_db(info, message.from_user.id)
         bot.send_message(message.from_user.id, 'Расписание установлено\u2705')
     else:
         msg = bot.send_message(message.from_user.id,message_bot.bad_input_time)

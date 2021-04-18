@@ -4,3 +4,4 @@ __pycahe__/
 test.py
 work_testDB.py
 botDB.sqlite
+/__init__.py

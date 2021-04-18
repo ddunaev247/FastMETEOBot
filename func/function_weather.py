@@ -1,6 +1,6 @@
 # this module contains the functions necessary to receive weather on request from the user
 
-from config import WEAHER_URL
+from const.config import WEAHER_URL
 import json
 import requests
 

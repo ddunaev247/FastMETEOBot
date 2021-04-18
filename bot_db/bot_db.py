@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
-engine = create_engine('sqlite:///botDB.db', echo=True, connect_args={"check_same_thread": False})
+engine = create_engine('sqlite:///bot_db/botDB.db', echo=True, connect_args={"check_same_thread": False})
 Base.metadata.create_all(engine)
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)

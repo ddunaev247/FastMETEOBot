@@ -3,10 +3,10 @@
 from datetime import datetime
 import time
 from multiprocessing import Process
-from bot_db import check_schedule
-from function_weather import get_weather
+from bot_db.bot_db import check_schedule
+from func.function_weather import get_weather
 import telebot
-from config import TOKEN
+from const.config import TOKEN
 
 
 bot = telebot.TeleBot(TOKEN)
