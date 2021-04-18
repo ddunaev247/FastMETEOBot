@@ -84,9 +84,8 @@ def user_time(message):
         bot_db.info.setdefault(message.from_user.id,[]).append(time[1])
         add_data_db(bot_db.info, message.from_user.id)
         bot.send_message(message.from_user.id, 'Расписание установлено\u2705')
-
     else:
-        msg = bot.send_message(message.from_user.id,'Данные введены некоректно, попробуйте заново, формат ввода ЧЧ:ММ')
+        msg = bot.send_message(message.from_user.id,message_bot.bad_input_time)
         bot.register_next_step_handler(msg, user_time)
 
 
@@ -110,8 +109,13 @@ def delete_one(callback_query):
 
 def delete_record(message):
     list_id = all_id_record()
-    if message.text.isdigit() == False or not int(message.text) in list_id:
-        msg = bot.send_message(message.from_user.id, 'Номер рассписания введен некоректно либо отсутствует, попробуйте заново')
+    if message.text == '/Погода':
+        msg = bot.send_message(message.from_user.id, 'Введи название города')
+        bot.register_next_step_handler(msg,command_weather_return)
+    elif message.text == '/Расписание':
+        bot.send_message(message.chat.id, message_bot.schedule, reply_markup=keyboard_schedule)
+    elif message.text.isdigit() == False or not int(message.text) in list_id:
+        msg = bot.send_message(message.from_user.id, message_bot.bad_input_id_schedule)
         bot.register_next_step_handler(msg, delete_record)
     else:
         delete_one_schedule(message.text)
@@ -127,9 +131,10 @@ def delete_all(callback_query):
 
 
 #@bot.message_handler(content_types=['text'])
-#def send_text(message):
-    #query = get_weather(message.text)
-    #bot.send_message(message.chat.id, query)
+#def return_cmd_weather(message):
+#   if message.text == '/Погода':
+#        msg = bot.send_message(message.chat.id, 'переключаю на погоду')
+#        bot.register_next_step_handler(msg, command_weather)
 
 
 
