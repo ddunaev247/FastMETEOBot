@@ -6,13 +6,13 @@ button_schedule = types.KeyboardButton('/Расписание')
 keyboard_menu.add(button_weather_in_city)
 keyboard_menu.add(button_schedule)
 
-keyboard_inline = types.InlineKeyboardMarkup()
-button_replay = types.InlineKeyboardButton(text='Заново \ud83d\udd04', callback_data='/Погода')
-keyboard_inline.add(button_replay)
+keyboard_repeat = types.InlineKeyboardMarkup()
+button_repeat = types.InlineKeyboardButton(text='Новый запрос', callback_data='new_query')
+keyboard_repeat.add(button_repeat)
 
 keyboard_schedule = types.InlineKeyboardMarkup()
-button_set_schedule = types.InlineKeyboardButton(text='Установить расписание \u23f0', callback_data='set')
-button_get_my_schedule = types.InlineKeyboardButton(text='Мои расписания \ud83d\uddd3', callback_data='get')
+button_set_schedule = types.InlineKeyboardButton(text='Установить расписание', callback_data='set')
+button_get_my_schedule = types.InlineKeyboardButton(text='Мои расписания', callback_data='get')
 keyboard_schedule.add(button_set_schedule)
 keyboard_schedule.add(button_get_my_schedule)
 
