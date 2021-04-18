@@ -1,12 +1,12 @@
+# the main bot module, it contains the main handlers and functions
+
 import flask
 from flask import Flask, request, Response
-import requests
 from config import TOKEN
 import message_bot
 import telebot
 from function_weather import get_weather
 from keyboards import keyboard_menu, keyboard_repeat, keyboard_schedule, keyboard_schedule_delete
-from telebot.types import ReplyKeyboardRemove
 from bot_db import *
 import bot_db
 import logging
@@ -34,22 +34,26 @@ def run_bot():
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
+    'start command handler'
     bot.send_message(message.chat.id, message_bot.start, reply_markup=keyboard_menu)
 
 
 @bot.message_handler(commands=['Погода'])
 def command_weather(message):
+    'weather command handler'
     msg = bot.send_message(message.chat.id, 'Введи название города')
     bot.register_next_step_handler(msg, command_weather_return )
 
 
 def command_weather_return(message):
+    'function of sending a message by a bot, with the results of a request for weather in the city'
     result = get_weather(message.text)
     bot.send_message(message.chat.id, result, reply_markup=keyboard_repeat)
 
 
 @bot.callback_query_handler(lambda c: c.data == 'new_query')
 def callback_weather(callback_query):
+    'new weather request handler'
     bot.answer_callback_query(callback_query.id)
     msg = bot.send_message(callback_query.from_user.id, 'Введи название города')
     bot.register_next_step_handler(msg, command_weather_return)
@@ -57,17 +61,20 @@ def callback_weather(callback_query):
 
 @bot.message_handler(commands=['Расписание'])
 def command_schedule(message):
+    'schedule command handler'
     bot.send_message(message.chat.id, message_bot.schedule, reply_markup=keyboard_schedule)
 
 
 @bot.callback_query_handler(lambda c: c.data == 'set')
 def set_schedule(callback_query):
+    'handler and scheduling function'
     bot.answer_callback_query(callback_query.id)
     msg = bot.send_message(callback_query.from_user.id, '1-ое: Введи название города')
     bot.register_next_step_handler(msg, user_city)
 
 
 def user_city(message):
+    'function of requesting the city from the user, for the schedule'
     msg = bot.send_message(message.chat.id, '2-ое: Введи время в формате ЧЧ:ММ')
     if not bot_db.info.get(message.from_user.id) == None:
         del bot_db.info[message.from_user.id]
@@ -77,6 +84,7 @@ def user_city(message):
 
 
 def user_time(message):
+    'function of requesting time from the user, for the schedule'
     time = message.text
     time = time.split(':')
     if (time[0].isdigit() and -1 < int(time[0]) < 24) and (time[1].isdigit() and -1 < int(time[0]) < 59):
@@ -91,6 +99,7 @@ def user_time(message):
 
 @bot.callback_query_handler(lambda c: c.data == 'get')
 def get_schedule(callback_query):
+    'handler and function for displaying user schedules'
     bot.answer_callback_query(callback_query.id)
     string = get_user_schedule(callback_query.from_user.id)
     if not string:
@@ -102,12 +111,14 @@ def get_schedule(callback_query):
 
 @bot.callback_query_handler(lambda c: c.data == 'delete_one')
 def delete_one(callback_query):
+    'handler for deleting one schedule entry'
     bot.answer_callback_query(callback_query.id)
     msg = bot.send_message(callback_query.from_user.id, 'Введите номер расписания')
     bot.register_next_step_handler(msg, delete_record)
 
 
 def delete_record(message):
+    'the function of deleting the schedule by its number, with checks of the entered data from the user'
     list_id = all_id_record()
     if message.text == '/Погода':
         msg = bot.send_message(message.from_user.id, 'Введи название города')
@@ -124,18 +135,10 @@ def delete_record(message):
 
 @bot.callback_query_handler(lambda c: c.data == 'delete_all')
 def delete_all(callback_query):
+    'handler and function for deleting all user schedules'
     bot.answer_callback_query(callback_query.id)
     bot.send_message(callback_query.from_user.id, 'Все записи удалены\u2705')
     delete_all_shedule(callback_query.from_user.id)
-
-
-
-#@bot.message_handler(content_types=['text'])
-#def return_cmd_weather(message):
-#   if message.text == '/Погода':
-#        msg = bot.send_message(message.chat.id, 'переключаю на погоду')
-#        bot.register_next_step_handler(msg, command_weather)
-
 
 
 if __name__ == '__main__':
