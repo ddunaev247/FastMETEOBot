@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}
+    admin panel schedule
+{% endblock %}
+
+{% block content_title %}
+    Раписания
+    {% for schedule in schedules %}
+        {{ schedule.id, schedule.user_id }}
+    {% endfor %}
+{% endblock %}

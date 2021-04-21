@@ -1,0 +1,5 @@
+venv/
+.idea/
+__pycahe__/
+test.py
+/__init__.py
