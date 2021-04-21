@@ -1,9 +1,15 @@
 # module for working with the bot database
+from app import app
 
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy(app)
+
 
 Base = declarative_base()
 engine = create_engine('sqlite:///bot_db/botDB.db', echo=True, connect_args={"check_same_thread": False})
@@ -14,7 +20,7 @@ session = DBSession()
 info = {}
 
 class Schedule(Base):
-    __tablename__ = 'schedule'
+    __tablename__ = 'schedules'
     id = Column(Integer, nullable=False, primary_key=True, autoincrement=True)
     user_id = Column('user_id',Integer, nullable=False)
     city = Column('city', String(250), nullable=False)
@@ -22,6 +28,20 @@ class Schedule(Base):
     time_minutes = Column('time_minutes', Integer, nullable=False)
     def __repr__(self):
        return f'{self.id}, {self.user_id}, {self.city}, {self.time_hour}:{self.time_minutes}'
+
+class Schedules(db.Model):
+    __tablename__ = 'schedules'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer)
+    city = db.Column(db.String(140))
+    time_hour = db.Column(db.Integer)
+    time_minutes = db.Column(db.Integer)
+
+    def __init__(self, *args, **kwargs):
+        super(Schedules, self).__init__(*args, **kwargs)
+
+    def __repr__(self):
+        return self.id, self.user_id, self.city, self.time_hour, self.time_minutes
 
 
 def add_data_db(data: dict, id:int) -> None:
@@ -38,7 +58,7 @@ def get_user_schedule(user_id: int) -> str:
     return data_for_message
 
 def delete_one_schedule(record_id:int) -> None:
-    'function of deleting one schedule from the database specified by the user'
+    'function of deleting one schedules from the database specified by the user'
     delete_record = session.query(Schedule).filter(Schedule.id==record_id).one()
     session.delete(delete_record)
     session.commit()
@@ -57,7 +77,7 @@ def check_schedule(hour: int, minutes: int) ->tuple:
     return data
 
 def all_id_record() -> list:
-    'the function returns all schedule numbers'
+    'the function returns all schedules numbers'
     list_record = session.query(Schedule).filter(Schedule.id).all()
     list_id = [item.id for item in list_record]
     return list_id

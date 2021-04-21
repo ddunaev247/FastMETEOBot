@@ -11,7 +11,7 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 class Schedule(Base):
-    __tablename__ = 'schedule'
+    __tablename__ = 'schedules'
     id = Column(Integer, nullable=False, primary_key=True, autoincrement=True)
     user_id = Column('user_id',Integer, nullable=False)
     city = Column('city', String(250), nullable=False)

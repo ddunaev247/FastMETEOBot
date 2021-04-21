@@ -27,3 +27,4 @@ def get_weather(city: str) -> str:
         return 'город не найден'
     data = json.loads(res.content)
     return parse_weather(data)
+
