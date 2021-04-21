@@ -1,7 +1,7 @@
 # the main bot module, it contains the main handlers and functions
 
 import flask
-from flask import Flask, request, Response
+from flask import Flask, request, Response,render_template
 from const import message_bot
 from const.config import TOKEN
 import telebot
@@ -30,6 +30,11 @@ def run_bot():
     else:
         return ''
 
+
+
+@app.route('/admin', methods=['POST', 'GET'])
+def admin_panel():
+    return render_template('admin_schedule.html')
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -142,5 +147,5 @@ def delete_all(callback_query):
 
 if __name__ == '__main__':
     process_autoposting.start()
-    app.run()
+    app.run(debug=True)
 
