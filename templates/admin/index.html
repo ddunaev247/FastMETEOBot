@@ -1,0 +1,22 @@
+{% extends 'admin/master.html' %}
+{% block title %}
+    Ноme - Admin
+{% endblock %}
+{% block body %}
+{{ super() }}
+
+<div class="row">
+    <h1>Главная страница админ-панели FastMeteoBot</h1>
+    <p class="lead">
+        Разделы:
+    </p>
+    <p>
+        "Раписание" - Список всех расписаний пользователей. Доступно редактирование/добавление/удаление расписаний
+    </p>
+    <p>
+        "Статистика" - Информационная статистика для администратора
+    </p>
+</div>
+{% block content %}
+{% endblock content %}
+{% endblock body %}

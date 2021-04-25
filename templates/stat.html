@@ -1,8 +1,17 @@
+
 {% extends 'base.html' %}
+
 {% block title %}
-    admin panel statistics
+    Статистика
 {% endblock %}
 
 {% block content_title %}
     Статистика
+{% endblock %}
+{% block content %}
+
+<div>
+    <p>Популярность городов в расписаниях</p>
+    <img src="{{ url_for("static", filename="pop_city.png") }}" alt="ops image" width="500" height="300">
+</div>
 {% endblock %}

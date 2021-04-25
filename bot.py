@@ -4,7 +4,7 @@
 ###packages###
 from app import app
 import flask
-from flask import Flask, request, Response,render_template
+from flask import Flask, request, Response
 from const import message_bot
 from const.config import TOKEN
 import telebot
@@ -15,6 +15,8 @@ from multiprocessing import Process
 from func.func_weather import get_weather
 from keyboards.keyboards import *
 from bot_db.bot_db import *
+from func.func_time import *
+
 
 
 logger = telebot.logger
@@ -34,6 +36,31 @@ def run_bot():
     else:
         return ''
 
+def check_now_time() -> (int, int, int):
+    'this function takes the current time and returns: the number of hours and minutes'
+    return datetime.now().time().hour, datetime.now().time().minute
+
+
+def check_now_date() -> (int, int, int):
+    'this function takes the current time and returns: the number of year,month and day'
+    return datetime.now().year, datetime.now().month, datetime.now().day
+
+def check_send_messages() ->None:
+    '''this function checks the database for the presence of schedules equal to the current time,
+     if available, it sends weather messages to the users who set the schedules'''
+    while True:
+        hour, min = check_now_time()
+        list_schedule = check_schedule(hour, min)
+        for item in list_schedule:
+            result = get_weather(item.city)
+            try:
+                bot.send_message(item.user_id, result)
+            except:
+                delete_all_shedule(item.user_id)
+
+        time.sleep(60)
+
+process_autoposting = Process(target=check_send_messages, args=())
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -52,6 +79,12 @@ def command_weather_return(message):
     'function of sending a message by a bot, with the results of a request for weather in the city'
     result = get_weather(message.text)
     bot.send_message(message.chat.id, result, reply_markup=keyboard_repeat)
+    if not info_query.get(message.from_user.id) == None:
+        del info_query[message.from_user.id]
+    info_query.setdefault(message.from_user.id, []).extend([message.from_user.id,message.text, result.replace(r"\n","\t"),
+                                                            check_year(), check_month(), check_day(), check_hour(),
+                                                            check_minutes(),check_second()])
+    add_data_queries(info_query, message.from_user.id)
 
 
 @bot.callback_query_handler(lambda c: c.data == 'new_query')
@@ -93,7 +126,7 @@ def user_time(message):
     if (time[0].isdigit() and -1 < int(time[0]) < 24) and (time[1].isdigit() and -1 < int(time[0]) < 59):
         info.setdefault(message.from_user.id,[]).append(time[0])
         info.setdefault(message.from_user.id,[]).append(time[1])
-        add_data_db(info, message.from_user.id)
+        add_data_schedule(info, message.from_user.id)
         bot.send_message(message.from_user.id, 'Расписание установлено\u2705')
     else:
         msg = bot.send_message(message.from_user.id,message_bot.bad_input_time)
@@ -144,24 +177,7 @@ def delete_all(callback_query):
     delete_all_shedule(callback_query.from_user.id)
 
 
-def check_now_time() -> (int, int):
-    'this function takes the current time and returns: the number of hours and minutes'
-    return datetime.now().time().hour, datetime.now().time().minute
-
-
-def check_send_messages() ->None:
-    '''this function checks the database for the presence of schedules equal to the current time,
-     if available, it sends weather messages to the users who set the schedules'''
-    while True:
-        hour, min = check_now_time()
-        list_schedule = check_schedule(hour, min)
-        for item in list_schedule:
-            result = get_weather(item.city)
-            bot.send_message(item.user_id, result)
-        time.sleep(60)
-
-process_autoposting = Process(target=check_send_messages, args=())
 
 if __name__ == '__main__':
     process_autoposting.start()
-    app.run()
+    app.run(debug=True)

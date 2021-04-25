@@ -1,11 +1,5 @@
-{% extends 'base.html' %}
+{% extends 'admin/master.html' %}
 {% block title %}
-    admin panel schedule
+    Schedules - Admin
 {% endblock %}
 
-{% block content_title %}
-    Раписания
-    {% for schedule in schedules %}
-        {{ schedule.id, schedule.user_id }}
-    {% endfor %}
-{% endblock %}

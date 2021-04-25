@@ -3,6 +3,7 @@ from app import app
 db = SQLAlchemy(app)
 
 info = {}
+info_query = {}
 
 
 class Schedule(db.Model):
@@ -20,12 +21,37 @@ class Schedule(db.Model):
         return self.id, self.user_id, self.city, self.time_hour, self.time_minutes
 
 
-def add_data_db(data: dict, id:int) -> None:
+class Queries(db.Model):
+    __tablename__ = 'queries'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer)
+    city = db.Column(db.String(140))
+    result = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    month = db.Column(db.Integer)
+    day = db.Column(db.Integer)
+    time_hour = db.Column(db.Integer)
+    time_minutes = db.Column(db.Integer)
+    time_second = db.Column(db.Integer)
+
+    def __init__(self, *args, **kwargs):
+        super(Queries, self).__init__(*args, **kwargs)
+
+    def __repr__(self):
+        return f'{self.id} - {self.user_id}, {self.city}, {self.result}, {self.year}.{self.month}.{self.day} \
+        {self.time_hour}:{self.time_minutes}:{self.time_second}'
+
+def add_data_schedule(data: dict, id: int) -> None:
     'function of adding data to the database'
     data_record = Schedule(user_id=data[id][0], city=data[id][1], time_hour=data[id][2], time_minutes=data[id][3])
     db.session.add(data_record)
     db.session.commit()
 
+def add_data_queries(data: dict, id: int) -> None:
+    data_record = Queries(user_id=data[id][0],city=data[id][1],result=data[id][2], year=data[id][3],month=data[id][4],
+                          day=data[id][5],time_hour=data[id][6],time_minutes=data[id][7],time_second=data[id][8])
+    db.session.add(data_record)
+    db.session.commit()
 
 def get_user_schedule(user_id: int) -> str:
     'function for getting the schedules set by the user'
@@ -60,3 +86,5 @@ def all_id_record() -> list:
     list_record = db.session.query(Schedule).filter(Schedule.id).all()
     list_id = [item.id for item in list_record]
     return list_id
+
+
