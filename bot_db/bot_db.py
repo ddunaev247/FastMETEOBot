@@ -37,6 +37,10 @@ class Queries(db.Model):
     def __init__(self, *args, **kwargs):
         super(Queries, self).__init__(*args, **kwargs)
 
+    @property
+    def can_edit(self):
+        return False
+
     def __repr__(self):
         return f'{self.id} - {self.user_id}, {self.city}, {self.result}, {self.year}.{self.month}.{self.day} \
         {self.time_hour}:{self.time_minutes}:{self.time_second}'

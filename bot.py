@@ -16,6 +16,7 @@ from func.func_weather import get_weather
 from keyboards.keyboards import *
 from bot_db.bot_db import *
 from func.func_time import *
+from statistics.static import create_statistics
 
 
 
@@ -61,7 +62,7 @@ def check_send_messages() ->None:
         time.sleep(60)
 
 process_autoposting = Process(target=check_send_messages, args=())
-
+process_create_statistics = Process(target=create_statistics, args=())
 @bot.message_handler(commands=['start'])
 def start_message(message):
     'start command handler'
@@ -77,14 +78,21 @@ def command_weather(message):
 
 def command_weather_return(message):
     'function of sending a message by a bot, with the results of a request for weather in the city'
-    result = get_weather(message.text)
-    bot.send_message(message.chat.id, result, reply_markup=keyboard_repeat)
-    if not info_query.get(message.from_user.id) == None:
-        del info_query[message.from_user.id]
-    info_query.setdefault(message.from_user.id, []).extend([message.from_user.id,message.text, result.replace(r"\n","\t"),
-                                                            check_year(), check_month(), check_day(), check_hour(),
-                                                            check_minutes(),check_second()])
-    add_data_queries(info_query, message.from_user.id)
+    if message.text != '/Погода' and message.text != '/Расписание':
+        result = get_weather(message.text)
+        bot.send_message(message.chat.id, result, reply_markup=keyboard_repeat)
+        if not info_query.get(message.from_user.id) == None:
+            del info_query[message.from_user.id]
+        info_query.setdefault(message.from_user.id, []).extend([message.from_user.id,message.text, result.replace(r"\n","\t"),
+                                                                check_year(), check_month(), check_day(), check_hour(),
+                                                                check_minutes(),check_second()])
+        add_data_queries(info_query, message.from_user.id)
+
+    elif message.text == '/Погода':
+        msg = bot.send_message(message.from_user.id, 'Введи название города')
+        bot.register_next_step_handler(msg,command_weather_return)
+    elif message.text == '/Расписание':
+        bot.send_message(message.chat.id, message_bot.schedule, reply_markup=keyboard_schedule)
 
 
 @bot.callback_query_handler(lambda c: c.data == 'new_query')
@@ -180,4 +188,5 @@ def delete_all(callback_query):
 
 if __name__ == '__main__':
     process_autoposting.start()
+    process_create_statistics.start()
     app.run(debug=True)
