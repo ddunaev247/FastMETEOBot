@@ -24,6 +24,6 @@ def get_weather(city: str) -> str:
     'this is a function for getting weather by city name'
     res = requests.get(WEAHER_URL.format(city=city))
     if res.status_code != 200:
-        return 'город не найден'
+        return 'Город не найден'
     data = json.loads(res.content)
     return parse_weather(data)

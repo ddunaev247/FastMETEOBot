@@ -1,8 +1,9 @@
 from datetime import datetime
 
+"the module contains functions for getting the current: year, month, day, hour, minute, second"
+
 def check_year() -> int:
     return datetime.now().year
-
 
 def check_month() -> int:
     return datetime.now().month

@@ -1,4 +1,7 @@
+# Database module
+
 from flask_sqlalchemy import SQLAlchemy
+from flask_security import UserMixin, RoleMixin
 from app import app
 db = SQLAlchemy(app)
 
@@ -37,13 +40,30 @@ class Queries(db.Model):
     def __init__(self, *args, **kwargs):
         super(Queries, self).__init__(*args, **kwargs)
 
-    @property
-    def can_edit(self):
-        return False
 
     def __repr__(self):
         return f'{self.id} - {self.user_id}, {self.city}, {self.result}, {self.year}.{self.month}.{self.day} \
         {self.time_hour}:{self.time_minutes}:{self.time_second}'
+
+roles_users = db.Table('roles_users',
+                       db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+                       db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+                       )
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(250))
+    active = db.Column(db.Boolean())
+    roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
+
+
+class Role(db.Model, RoleMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True)
+    description = db.Column(db.String(250))
+
+
 
 def add_data_schedule(data: dict, id: int) -> None:
     'function of adding data to the database'
@@ -79,7 +99,7 @@ def delete_all_shedule(user_id:int) -> None:
     db.session.commit()
 
 
-def check_schedule(hour: int, minutes: int) ->tuple:
+def check_schedule(hour: int, minutes: int) -> tuple:
     'function of checking the availability of schedules in the database, which correspond to the current time'
     data = db.session.query(Schedule).filter(Schedule.time_hour==hour).filter(Schedule.time_minutes==minutes).all()
     return data

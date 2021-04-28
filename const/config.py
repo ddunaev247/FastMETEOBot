@@ -9,4 +9,7 @@ class Configuration(object):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = 'sqlite:///bot_db/botDB.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    #SEND_FILE_MAX_AGE_DEFAULT = 0
     SECRET_KEY = 'super secret key'
+    SECURITY_PASSWORD_SALT = 'salt'
+    SECURITY_PASSWORD_HASH = 'bcrypt'
