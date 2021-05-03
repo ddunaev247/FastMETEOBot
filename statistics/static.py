@@ -4,6 +4,7 @@ from app import db,Schedule,Queries
 from func.func_time import check_year, check_month, check_day
 from datetime import datetime,timedelta
 
+
 def popular_city_dgrm() -> None:
     'function that creates a graph of the popularity of cities in schedules'
     list_city = []
@@ -17,12 +18,12 @@ def popular_city_dgrm() -> None:
     width = 0.25
     figure = plt.figure()
     axes = figure.gca()
-    axes.bar(positions, count_city, width, tick_label=list_city,
-             align='center')
+    axes.bar(positions, count_city, width, tick_label=list_city, align='center')
     axes.set_title('Пополурность городов в расписаниях')
     axes.set_xlabel('Города')
     axes.set_ylabel('Количество в расписаниях')
     plt.savefig('static/pop_city.png')
+
 
 def popular_hour_dgrm() -> None:
     'function that creates a chart of the popularity of hours in schedules'
@@ -37,12 +38,12 @@ def popular_hour_dgrm() -> None:
     width = 0.25
     figure = plt.figure()
     axes = figure.gca()
-    axes.bar(positions, count_hour, width, tick_label=list_hour,
-             align='center')
+    axes.bar(positions, count_hour, width, tick_label=list_hour, align='center')
     axes.set_title('Пополурность часа в расписаниях')
     axes.set_xlabel('Час')
     axes.set_ylabel('Количество в расписаниях')
     plt.savefig('static/pop_hour.png')
+
 
 def statistics_queries() -> None:
     'function that creates a chart of the number of requests for the last 7 days'
@@ -61,8 +62,7 @@ def statistics_queries() -> None:
     width = 0.25
     figure = plt.figure()
     axes = figure.gca()
-    axes.bar(positions, list_count, width, tick_label=list_days,
-             align='center')
+    axes.bar(positions, list_count, width, tick_label=list_days, align='center')
     axes.set_title('Количество запросов за последние 7 дней')
     axes.set_xlabel('День')
     axes.set_ylabel('Количество запросов')

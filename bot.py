@@ -1,7 +1,6 @@
 # the main bot module, it contains the main handlers and functions
 
 
-###packages###
 from app import app
 import flask
 from flask import request, Response
@@ -18,10 +17,10 @@ from func.func_time import *
 from typing import Union
 
 
-
 logger = telebot.logger
 telebot.logger.setLevel(logging.DEBUG)
 bot = telebot.TeleBot(TOKEN)
+
 
 @app.route('/', methods=['POST', 'GET'])
 def run_bot() -> Union[dict, str]:
@@ -38,7 +37,6 @@ def run_bot() -> Union[dict, str]:
         return ''
 
 
-
 def check_send_messages() ->None:
     '''this function checks the database for the presence of schedules equal to the current time,
      if available, it sends weather messages to the users who set the schedules'''
@@ -53,7 +51,8 @@ def check_send_messages() ->None:
                 delete_all_shedule(item.user_id)
         time.sleep(60)
 
-process_autoposting = Process(target=check_send_messages, args=())
+
+process_autoposting = Process(target=check_send_messages, args=())      # creating a separate process for auto-posting
 
 
 @bot.message_handler(commands=['start'])
