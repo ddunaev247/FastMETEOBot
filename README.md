@@ -1,6 +1,6 @@
 <p class="has-line-data" data-line-start="0" data-line-end="17">FastMETEOBot<br>
  <div>Телеграм бот погоды. Быстрое получение погоды по запросу, поддержка результатов погоды по расписанию</div>
- <div></div>
+ <div> </div>
 Структура репозитория<br>
 ├── bot_db<br>
 │ └── bot_db.py # функции работы с БД<br>
