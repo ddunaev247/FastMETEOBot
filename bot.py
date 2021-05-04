@@ -1,6 +1,5 @@
 # the main bot module, it contains the main handlers and functions
 
-
 from app import app
 import flask
 from flask import request, Response
