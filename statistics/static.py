@@ -3,6 +3,7 @@ import numpy as np
 from app import db,Schedule,Queries
 from func.func_time import check_year, check_month, check_day
 from datetime import datetime,timedelta
+import time
 
 
 def popular_city_dgrm() -> None:
@@ -68,4 +69,9 @@ def statistics_queries() -> None:
     axes.set_ylabel('Количество запросов')
     plt.savefig('static/queries.png')
 
-
+def create_statistic() -> None:
+    while True:
+        popular_city_dgrm()
+        popular_hour_dgrm()
+        statistics_queries()
+        time.sleep(3600)

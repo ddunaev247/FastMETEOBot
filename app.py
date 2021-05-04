@@ -13,7 +13,7 @@ app.config.from_object(Configuration)
 admin = Admin(app, base_template='admin/no-brand-layout.html', template_mode='bootstrap3')
 
 from bot_db.bot_db import db, Schedule, Queries
-from statistics.static import popular_hour_dgrm, popular_city_dgrm, statistics_queries
+
 
 migrate = Migrate(app, db)
 manager = Manager(app)
@@ -22,11 +22,8 @@ manager.add_command('db', MigrateCommand)
 
 class Statistics(BaseView):
     'Class and view for the "Statistics" admin page'
-    @expose('/', methods= ['GET'])
+    @expose('/')
     def statistics(self):
-        popular_city_dgrm()
-        popular_hour_dgrm()
-        statistics_queries()
         return self.render('statnew.html')
 
 

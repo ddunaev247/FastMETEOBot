@@ -15,6 +15,7 @@ from keyboards.keyboards import *
 from bot_db.bot_db import *
 from func.func_time import *
 from typing import Union
+from statistics.static import create_statistic
 
 
 logger = telebot.logger
@@ -52,7 +53,8 @@ def check_send_messages() ->None:
         time.sleep(60)
 
 
-process_autoposting = Process(target=check_send_messages, args=())      # creating a separate process for auto-posting
+process_autoposting = Process(target=check_send_messages, args=())    # creating a separate process for auto-posting
+process_create_statistic = Process(target=create_statistic, args=())   # a separate process for creating statistics once an hour
 
 
 @bot.message_handler(commands=['start'])
@@ -184,4 +186,5 @@ def delete_all(callback_query: types.CallbackQuery) -> None:
 
 if __name__ == '__main__':
     process_autoposting.start()
+    process_create_statistic.start()
     app.run(debug=False)
