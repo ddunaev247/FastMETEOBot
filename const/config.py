@@ -5,6 +5,7 @@ url_setwebhook = 'https://api.telegram.org/bot1680539744:AAG0xvH_GXxB3njPnsBNomc
 WEAHER_TOKEN = '4d119f7db2aec24c6a9e214968be8ac2'
 WEAHER_URL = 'http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid=4d119f7db2aec24c6a9e214968be8ac2&lang=ru'
 
+
 class Configuration(object):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = 'sqlite:///bot_db/botDB.db'

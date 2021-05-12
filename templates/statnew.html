@@ -1,15 +1,16 @@
 {% extends 'admin/master.html' %}
-
 {% block title %}
     Statistics - Admin
 {% endblock %}
 
 {% block body %}
-    {{ super() }}
 <div>
-    <img src="{{ url_for("static", filename="pop_city.png") }}" alt="ops image" width="900" height="500">
+    <img src="{{ url_for("static", filename='pop_city.png') }}" alt="ops image" width="900" height="500">
 </div>
 <div>
     <img src="{{ url_for("static", filename="pop_hour.png") }}" alt="ops image" width="900" height="500">
+</div>
+<div>
+    <img src="{{ url_for("static", filename="queries.png" ) }}" alt="ops image" width="900" height="500">
 </div>
 {% endblock body%}
